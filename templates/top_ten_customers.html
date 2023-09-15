@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Top Ten Customers{% endblock %}
+{% block content %}
+
+  <a class="btn btn-primary" style="float: right" href="/add/">Add a Customer</a>
+
+  <h1>Top Ten Customers</h1>
+
+  <div class="row">
+  <ol style="column-count: 1" class="col-auto">
+    {% for customer in customers %}
+      <li>
+        <a href="/{{ customer.id }}/">
+          {{ customer.fullName() }}
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+
+  <ul style="column-count: 1" class="col-6 list-unstyled">
+    {% for customer in customers %}
+      <li>
+        <span class="fw-bold">{{ customer.reservationCount }} Reservations</span>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+
+{% endblock %}

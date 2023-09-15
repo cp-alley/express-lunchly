@@ -97,24 +97,52 @@ class Customer {
     }
   }
 
+  /** Returns an array of customer instances with firstName, lastName, id, and
+   * reservationCount.
+   */
   static async getTopTenCustomers() {
     const reservationResults = await db.query(
-      `SELECT customer_id, COUNT(*) AS resCount
+      `SELECT customer_id AS "id",
+              COUNT(*) AS "resCount",
+              first_name AS "firstName",
+              last_name AS "lastName"
         FROM reservations
-        GROUP BY customer_id
-        ORDER BY COUNT(*) DESC
-        LIMIT 10`
+        JOIN customers
+        ON customer_id = customers.id
+      GROUP BY customer_id, first_name, last_name
+      ORDER BY COUNT(*) DESC, last_name
+      LIMIT 10;`
     );
-    console.log("reservationresults=", reservationResults)
+    console.log("reservationresults=", reservationResults);
 
-    const respPromises = reservationResults.rows.map(async function (row) {
-      console.log("row=", row)
-      let customer = await Customer.get(Number(row.customer_id));
-      customer.reservationCount = row.resCount;
+    const topTen = reservationResults.rows.map(function (c) {
+      const customer = new Customer(c);
+      customer.reservationCount = c.resCount;
+      return customer;
     });
-    const topTen = await Promise.allSettled(respPromises);
+    console.log("topTen is:", topTen);
+
     return topTen;
+
   }
+
+  /** Search for customers */
+  static async searchForCustomers(qString){
+    const searchResults = await db.query(
+      `SELECT id,
+      first_name AS "firstName",
+      last_name  AS "lastName",
+      phone,
+      notes
+      FROM customers
+      WHERE first_name ILIKE '%' || $1 || '%'
+        OR last_name ILIKE '%' || $1 || '%'
+      ORDER BY last_name, first_name`,
+      [qString]
+    );
+    return searchResults.rows.map(c => new Customer(c));
+  }
+
 }
 
 module.exports = Customer;

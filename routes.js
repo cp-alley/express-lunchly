@@ -13,19 +13,14 @@ const router = new express.Router();
 /** Homepage: show list of customers. */
 
 router.get("/", async function (req, res, next) {
-  const customers = await Customer.all();
   if (req.query.search) {
-    const searchString = req.query.search.toLowerCase();
+    const searchString = req.query.search;
+    const matchedCustomers = await Customer.searchForCustomers(searchString);
 
-    const matchedCustomers = customers.filter( function(customer) {
-      if (customer.firstName.toLowerCase().includes(searchString) ||
-        customer.lastName.toLowerCase().includes(searchString) ||
-        customer.fullName().toLowerCase().includes(searchString)) {
-          return customer;
-        }
-    });
-    return res.render("customer_list.html", {customers: matchedCustomers});
+    return res.render("customer_list.html", { customers: matchedCustomers });
   }
+
+  const customers = await Customer.all();
 
   return res.render("customer_list.html", { customers });
 });
@@ -33,7 +28,7 @@ router.get("/", async function (req, res, next) {
 /** Form to add a new customer. */
 
 router.get("/add/", async function (req, res, next) {
-  console.log("hit add customer route")
+  console.log("hit add customer route");
   return res.render("customer_new_form.html");
 });
 
@@ -53,16 +48,16 @@ router.post("/add/", async function (req, res, next) {
 /** Show top ten customers by reservation count */
 
 router.get("/top-ten/", async function (req, res, next) {
-  console.log("hit top ten route")
+  console.log("hit top ten route");
   const topTen = await Customer.getTopTenCustomers();
-  console.log("topTen=", topTen, "toptenvalue=", topTen[0].value)
-  return res.render("customer_list.html", { customers:topTen })
-})
+  console.log("topTen=", topTen, "toptenvalue=", topTen[0].value);
+  return res.render("top_ten_customers.html", { customers: topTen });
+});
 
 /** Show a customer, given their ID. */
 
 router.get("/:id/", async function (req, res, next) {
-  console.log("hit id route")
+  console.log("hit id route");
   const customer = await Customer.get(req.params.id);
 
   const reservations = await customer.getReservations();
