@@ -125,6 +125,24 @@ class Customer {
     return topTen;
 
   }
+
+  /** Search for customers */
+  static async searchForCustomers(qString){
+    const searchResults = await db.query(
+      `SELECT id,
+      first_name AS "firstName",
+      last_name  AS "lastName",
+      phone,
+      notes
+      FROM customers
+      WHERE first_name ILIKE '%' || $1 || '%'
+        OR last_name ILIKE '%' || $1 || '%'
+      ORDER BY last_name, first_name`,
+      [qString]
+    );
+    return searchResults.rows.map(c => new Customer(c));
+  }
+
 }
 
 module.exports = Customer;
