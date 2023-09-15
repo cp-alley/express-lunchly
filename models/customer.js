@@ -105,11 +105,15 @@ class Customer {
         ORDER BY COUNT(*) DESC
         LIMIT 10`
     );
+    console.log("reservationresults=", reservationResults)
 
-    return reservationResults.rows.map(function (row) {
-      let customer = Customer.get(Number(row.customer_id));
+    const respPromises = reservationResults.rows.map(async function (row) {
+      console.log("row=", row)
+      let customer = await Customer.get(Number(row.customer_id));
       customer.reservationCount = row.resCount;
     });
+    const topTen = await Promise.allSettled(respPromises);
+    return topTen;
   }
 }
 

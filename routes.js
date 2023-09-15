@@ -33,6 +33,7 @@ router.get("/", async function (req, res, next) {
 /** Form to add a new customer. */
 
 router.get("/add/", async function (req, res, next) {
+  console.log("hit add customer route")
   return res.render("customer_new_form.html");
 });
 
@@ -49,9 +50,19 @@ router.post("/add/", async function (req, res, next) {
   return res.redirect(`/${customer.id}/`);
 });
 
+/** Show top ten customers by reservation count */
+
+router.get("/top-ten/", async function (req, res, next) {
+  console.log("hit top ten route")
+  const topTen = await Customer.getTopTenCustomers();
+  console.log("topTen=", topTen, "toptenvalue=", topTen[0].value)
+  return res.render("customer_list.html", { customers:topTen })
+})
+
 /** Show a customer, given their ID. */
 
 router.get("/:id/", async function (req, res, next) {
+  console.log("hit id route")
   const customer = await Customer.get(req.params.id);
 
   const reservations = await customer.getReservations();
@@ -105,11 +116,6 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   return res.redirect(`/${customerId}/`);
 });
 
-/** Show top ten customers by reservation count */
 
-router.get("/top-ten", async function (req, res, next) {
-  const topTen = Customer.getTopTenCustomers;
-  return res.render("customer_list.html", { customers:topTen })
-})
 
 module.exports = router;
