@@ -117,6 +117,22 @@ router.get("/reservation/:id/", async function (req, res, next) {
   const customer = await Customer.get(reservation.customerId)
 
   return res.render("reservation_edit.html", { reservation, customer })
-})
+});
+
+router.post("/reservation/:id/", async function (req, res, next) {
+  if (req.body === undefined) {
+    throw new BadRequestError();
+  }
+
+  const reservation = await Reservation.getReservation(req.params.id);
+  //const customer = await Customer.get(reservation.customerId)
+
+  reservation.startAt = new Date(req.body.startAt);
+  reservation.numGuests = req.body.numGuests;
+  reservation.notes = req.body.notes;
+  await reservation.save();
+
+  return res.redirect(`/${reservation.customerId}/`);
+});
 
 module.exports = router;
