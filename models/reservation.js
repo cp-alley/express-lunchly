@@ -4,7 +4,10 @@
 
 const moment = require("moment");
 
+const { NotFoundError } = require("../expressError")
+
 const db = require("../db");
+const { Not } = require("nunjucks/src/nodes");
 
 /** A reservation for a party */
 
@@ -38,6 +41,29 @@ class Reservation {
     );
 
     return results.rows.map(row => new Reservation(row));
+  }
+
+  //** Get a reservation by id */
+
+  static async getReservation(id) {
+    const results = await db.query(
+      `SELECT id,
+                customer_id AS "customerId",
+                start_at AS "startAt",
+                num_guests AS "numGuests",
+                notes
+          FROM reservations
+          WHERE id = $1`,
+      [id]
+    );
+
+    const reservation = results.rows[0];
+
+     if (reservation === undefined) {
+      throw new NotFoundError("Reservation not found")
+     }
+
+     return new Reservation(reservation);
   }
 
   /** Saves a reservation to the database, creating it in the case that
