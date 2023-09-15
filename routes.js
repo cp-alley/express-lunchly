@@ -56,7 +56,7 @@ router.get("/top-ten/", async function (req, res, next) {
   console.log("hit top ten route")
   const topTen = await Customer.getTopTenCustomers();
   console.log("topTen=", topTen, "toptenvalue=", topTen[0].value)
-  return res.render("customer_list.html", { customers:topTen })
+  return res.render("top_ten_customers.html", { customers:topTen })
 })
 
 /** Show a customer, given their ID. */
