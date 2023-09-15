@@ -96,6 +96,18 @@ class Customer {
       );
     }
   }
+
+  static async getTopTenCustomers() {
+    const reservationResults = await db.query(
+      `SELECT customer_id, COUNT(*)
+        FROM reservations
+        GROUP BY customer_id
+        ORDER BY COUNT(*) DESC
+        LIMIT 10`
+    );
+
+
+  }
 }
 
 module.exports = Customer;

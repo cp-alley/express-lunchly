@@ -14,6 +14,19 @@ const router = new express.Router();
 
 router.get("/", async function (req, res, next) {
   const customers = await Customer.all();
+  if (req.query.search) {
+    const searchString = req.query.search.toLowerCase();
+
+    const matchedCustomers = customers.filter( function(customer) {
+      if (customer.firstName.toLowerCase().includes(searchString) ||
+        customer.lastName.toLowerCase().includes(searchString) ||
+        customer.fullName().toLowerCase().includes(searchString)) {
+          return customer;
+        }
+    });
+    return res.render("customer_list.html", {customers: matchedCustomers});
+  }
+
   return res.render("customer_list.html", { customers });
 });
 
