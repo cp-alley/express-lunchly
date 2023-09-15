@@ -105,4 +105,11 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   return res.redirect(`/${customerId}/`);
 });
 
+/** Show top ten customers by reservation count */
+
+router.get("/top-ten", async function (req, res, next) {
+  const topTen = Customer.getTopTenCustomers;
+  return res.render("customer_list.html", { customers:topTen })
+})
+
 module.exports = router;
