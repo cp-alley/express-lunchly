@@ -116,6 +116,12 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   return res.redirect(`/${customerId}/`);
 });
 
+router.get("/reservation/:id/", async function (req, res, next) {
+  const id = req.params.id;
+  const reservation = await Reservation.getReservation(id);
+  const customer = await Customer.get(reservation.customerId)
 
+  return res.render("reservation_edit.html", { reservation, customer })
+})
 
 module.exports = router;
